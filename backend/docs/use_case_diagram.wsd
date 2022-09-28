@@ -3,6 +3,7 @@ left to right direction
 "Administrador" as Admin
 "Jogador" as User
 Admin --> (Gerenciar usuários)
+Admin --> (Gerenciar tabuleiros/mapas)
 User --> (Criar sala)
 User --> (Entrar em uma sala)
 User --> (Iniciar partida)
@@ -10,4 +11,6 @@ User --> (Realizar jogada)
 User --> (Sair da sala)
 User --> (Sair da partida)
 User --> (Comprar cartas)
+User --> (Criar conta)
+User --> (Realizar login)
 @enduml
