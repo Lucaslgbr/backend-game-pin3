@@ -1,0 +1,9 @@
+@startuml
+Jogador -> Servidor: Realiza Login
+Jogador <-- Servidor: Retorna dados do usuário 
+Jogador -> Servidor: Entrar/Criar sala
+Jogador <-- Servidor: Retorna dados da sala 
+Jogador -> Servidor: Inicia partida
+Jogador --> Servidor: Conectar Websocket
+Jogador <-- Servidor: Websocket conectado
+@enduml

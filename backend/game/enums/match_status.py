@@ -1,0 +1,8 @@
+from asyncio.base_futures import _FINISHED
+from django.db import models
+
+
+class MatchStatus(models.IntegerChoices):
+    WAITING_FOR_PLAYERS = 1, 'WAITING_FOR_PLAYERS'
+    IN_PROGRESS = 2, 'IN_PROGRESS'
+    FINISHED = 3, 'FINISHED'

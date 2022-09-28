@@ -1,4 +1,5 @@
 from django.db import models
-
+#tabuleiro
 class Board(models.Model):
-    pass
+    lines = models.PositiveIntegerField()
+    columns = models.PositiveIntegerField()
