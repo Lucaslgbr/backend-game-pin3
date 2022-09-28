@@ -1,6 +1,6 @@
 from django.db import models
-
 from backend.game.enums.room_status import RoomStatus
+
 
 class Room(models.Model):
     name = models.CharField(max_length=255)

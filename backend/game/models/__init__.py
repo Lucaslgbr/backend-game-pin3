@@ -1,3 +1,4 @@
+
 from .board_entity import BoardEntity
 from .board import Board
 from .card import Card

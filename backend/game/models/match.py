@@ -2,6 +2,7 @@ from django.db import models
 
 from backend.game.enums.match_status import MatchStatus
 
+
 class Match(models.Model):
     room = models.ForeignKey('Room', on_delete=models.DO_NOTHING)
     winner = models.ForeignKey('User', on_delete=models.DO_NOTHING)
