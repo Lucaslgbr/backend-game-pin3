@@ -3,7 +3,7 @@ from backend.game.enums.match_user_status import MatchUserStatus
 
 
 class MatchUser(models.Model):
-    current_position = models.ForeignKey('Position', on_delete=models.DO_NOTHING)
+    position = models.ForeignKey('Position', on_delete=models.DO_NOTHING)
     match = models.ForeignKey('Match', on_delete=models.DO_NOTHING)
     user = models.ForeignKey('User', on_delete=models.DO_NOTHING)
     status = models.IntegerField(choices=MatchUserStatus.choices, default=MatchUserStatus.ONLINE, verbose_name='Status')
