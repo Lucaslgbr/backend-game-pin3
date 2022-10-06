@@ -9,3 +9,5 @@ class Room(models.Model):
     max_players = models.PositiveIntegerField()
     board = models.ForeignKey('Board', on_delete=models.DO_NOTHING)
     owner = models.ForeignKey('User', on_delete=models.DO_NOTHING)
+    users = models.ManyToManyField('User', verbose_name="Jogadores", related_name='users', blank=True)
+
