@@ -18,12 +18,13 @@ from django.urls import path, include
 from rest_framework.authtoken import views
 
 from backend.game.api.router import APIRouter
+from backend.game.views import CustomObtainAuthToken
 
 api_router = APIRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(api_router.urls)),
-    path('api/v1/auth/', views.obtain_auth_token,
+    path('api/v1/auth/', CustomObtainAuthToken.as_view(),
 )
 ]
