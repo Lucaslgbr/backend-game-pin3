@@ -141,7 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "deployment", BASE_DIR_NAME, "collected_static")
 
-ASGI_APPLICATION = 'backend.routing.application'
+ASGI_APPLICATION = 'backend.game.routing.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',

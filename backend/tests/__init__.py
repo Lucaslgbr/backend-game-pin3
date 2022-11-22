@@ -1,0 +1,1 @@
+from .websocket_test import TestConsumer

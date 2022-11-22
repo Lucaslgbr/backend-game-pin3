@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 class CustomConsumer(AsyncWebsocketConsumer):
     pk = None
@@ -22,9 +22,6 @@ class CustomConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
-    def validate_response(self, event, operation):
-        return True
 
     async def send_message(self, event):
         message = event['message']
