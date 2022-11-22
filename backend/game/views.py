@@ -17,4 +17,3 @@ class CustomObtainAuthToken(ObtainAuthToken):
             **UserSerializer(user).data
         }
         return Response(response)
-
