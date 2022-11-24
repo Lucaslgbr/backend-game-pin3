@@ -10,7 +10,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = self.scope['path'].split('/')[2]
         self.pk = self.scope['url_route']['kwargs'].get('pk', None)
-
+        print('CONSUMER CONNECT')
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
