@@ -1,7 +1,6 @@
 from django.db import models
 from backend.game.enums.room_status import RoomStatus
-
-
+from asgiref.sync import sync_to_async
 class Room(models.Model):
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255, blank=True, null=True)
@@ -11,3 +10,7 @@ class Room(models.Model):
     owner = models.ForeignKey('User', on_delete=models.DO_NOTHING)
     users = models.ManyToManyField('User', verbose_name="Jogadores", related_name='users', blank=True)
 
+    @sync_to_async
+    def finish(self):
+        self.status = RoomStatus.FINISHED
+        self.save()

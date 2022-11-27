@@ -10,7 +10,7 @@ from .api.v1.serializers import *
 def post_save_room(sender, instance, created, **kwargs):
     if not created:
         channel_layer = get_channel_layer()
-        room_name = instance.id
+        room_name = str(instance.id)
         async_to_sync(channel_layer.group_send)(room_name, {"type": "send_message",
                                                             "message": {'instance': RoomSerializer(instance).data}})
 
@@ -19,7 +19,7 @@ def post_save_room(sender, instance, created, **kwargs):
 def post_save_room(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        room_name = instance.room.id
+        room_name = str(instance.room.id)
         async_to_sync(channel_layer.group_send)(room_name, {"type": "send_message",
                                                             "message": {'instance': MatchSerializer(instance).data}})
 
@@ -30,6 +30,6 @@ def post_save_room(sender, instance, created, **kwargs):
 def post_save_room(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        room_name = instance.match.room.id
+        room_name = str(instance.match.room.id)
         async_to_sync(channel_layer.group_send)(room_name, {"type": "send_message",
                                                             "message": {'instance': MatchUserSerializer(instance).data}})
