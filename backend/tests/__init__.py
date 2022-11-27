@@ -1,1 +1,1 @@
-from .websocket_test import TestConsumer
+from .websocket_test import TestConnection
