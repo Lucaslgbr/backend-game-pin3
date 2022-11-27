@@ -12,6 +12,10 @@ class  RoomViewset(ModelViewSet):
         request.data.pop('users')
         response = super().update(request, *args, **kwargs)
         instance = self.get_object()
+        for instance_user in instance.users.all():
+            instance.users.remove(instance_user)
+        a = instance.users.all()
         for user in users:
             instance.users.add(User.objects.get(id=user))
+        response.data['users'] = users
         return response
