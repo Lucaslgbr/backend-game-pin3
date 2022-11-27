@@ -1,17 +1,17 @@
-from django.test import TestCase
-from channels.testing import WebsocketCommunicator
-from backend.game.consumers import RoomConsumer
-from channels.testing import HttpCommunicator
-from channels.testing import HttpCommunicator
+import asyncio
+from pywsitest import WSTest, WSResponse, WSMessage
 
-import pytest
-from channels.testing import HttpCommunicator
+async def test_user_1():
+    ws_test_1 = (
+        WSTest("ws://127.0.0.1:8000/ws/room/1/")
+        .with_parameter("event", "new_player")
+    )
 
-class TestConsumer(TestCase):
-    
-    @pytest.mark.asyncio
-    async def test_my_consumer():
-        communicator = HttpCommunicator(RoomConsumer.as_asgi(), "GET", "/test/")
-        response = await communicator.get_response()
-        assert response["body"] == b"test response"
-        assert response["status"] == 200
+    await ws_test_1.run()
+    assert ws_test_1.is_complete()
+
+
+async def run_tests():
+    await asyncio.gather(test_user_1())
+
+asyncio.get_event_loop().run_until_complete(run_tests())

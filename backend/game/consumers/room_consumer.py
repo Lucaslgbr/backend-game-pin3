@@ -2,7 +2,7 @@ import datetime
 import json
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
-
+from backend.game.models import Room, Match
 
 class RoomConsumer(AsyncWebsocketConsumer):
     players = []
@@ -10,7 +10,6 @@ class RoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = self.scope['path'].split('/')[2]
         self.pk = self.scope['url_route']['kwargs'].get('pk', None)
-
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -33,15 +32,29 @@ class RoomConsumer(AsyncWebsocketConsumer):
         event = response.get("event", None)
         message = response.get("message", None)
         if event == 'new_player':
-            new_player = response.get('player')
+            new_player = response.get('player', None)
             if new_player:
                 self.players.append(new_player)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
-                "event": "new_player"
+                "event": event
             })
-
+        if event == 'finish_match':
+            match_id = response.get('match', None)
+            match = Match.objects.get(id=match_id)
+            match.finish()
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'message': message,
+                "event": 'finish_match'
+            })
+        if event == 'message':
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'message': message,
+                "event": message
+            })
     async def send_message(self, res):
         """ Receive message from room group """
         # Send message to WebSocket
