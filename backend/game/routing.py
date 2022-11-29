@@ -6,7 +6,7 @@ from django.urls import path
 application = ProtocolTypeRouter({
     "websocket": URLRouter(
         [
-            path('ws/room/<int:pk>/', RoomConsumer),
+            path('ws/room/<int:pk>/<int:user_id>/', RoomConsumer),
         ]
     ),
 })
