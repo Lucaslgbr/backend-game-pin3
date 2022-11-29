@@ -17,3 +17,10 @@ class CustomObtainAuthToken(ObtainAuthToken):
             **UserSerializer(user).data
         }
         return Response(response)
+
+
+def index(request):
+    return render(request, "chat/index.html")
+
+def room(request, room_name, user_id):
+    return render(request, "chat/room.html", {"room_name": room_name, "user_id":user_id})
