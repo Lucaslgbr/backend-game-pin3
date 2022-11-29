@@ -76,11 +76,10 @@ class RoomConsumer(AsyncWebsocketConsumer):
             try:
                 room = await Room.objects.aget(id=self.room_group_name)
                 match = await Match.objects.acreate(room=room)
-                await match.finish()
                 message = 'success'
                 await self.channel_layer.group_send(self.room_group_name, {
                     'type': 'send_message',
-                    'message': 'success',
+                    'match': match.id,
                     "event": event
                     })
             except Exception as e:
