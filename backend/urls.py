@@ -16,15 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken import views
-
+from backend.game import views as viewss
 from backend.game.api.router import APIRouter
 from backend.game.views import CustomObtainAuthToken
 
 api_router = APIRouter()
 
 urlpatterns = [
+    path("", viewss.index, name="index"),
     path('admin/', admin.site.urls),
     path('api/', include(api_router.urls)),
-    path('api/v1/auth/', CustomObtainAuthToken.as_view(),
-)
+    path('api/v1/auth/', CustomObtainAuthToken.as_view()),
+    path("chat/<str:room_name>/<str:user_id>", viewss.room, name="room")
+
 ]
