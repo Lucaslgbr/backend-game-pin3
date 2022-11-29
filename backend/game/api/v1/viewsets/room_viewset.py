@@ -4,10 +4,29 @@ from backend.game.models import Room, User
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 class RoomViewset(ModelViewSet):
     queryset = Room.objects.all()
     serializer_class=RoomSerializer
+
+    @action(detail=True, methods=['put'])
+    def add_user(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user_id =  self.request.data.get('user')
+        user = User.objects.get(id=user_id)
+        instance.users.add(user)
+        return Response({'success':True},status=status.HTTP_200_OK)
+
+    
+    @action(detail=True, methods=['put'])
+    def remove_user(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user_id =  self.request.data.get('user')
+        user = User.objects.get(id=user_id)
+        instance.users.remove(user)
+        return Response({'success':True},status=status.HTTP_200_OK)
 
 
     @action(detail=True, methods=['get'])
