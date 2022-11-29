@@ -5,16 +5,23 @@ Equipe: André Cristen e Lucas Levi Gonçalves
 Para configurar o projeto, siga os passoas a seguir:
 
 1. Na raiz do projeto, crie um arquivo chamado .env, e adapte-o baseado no modelo abaixo(é necessário criar um banco no postgres):
+
 	DB_NAME=backend_game
+
     DB_USER=postgres
+
     DB_PASSWORD=senha
+
     DB_HOST=127.0.0.1
+
     DB_PORT=5432
+	
     DEBUG=True
 
 2. Deploy:
+
 	2.1 Deploy windows:
-		- No root do projeto você encontrará o Redis e o memcached. 
+		- No root do projeto você encontrará a pasta "docs", dentro dela estarão os arquivos Redis e memcached. 
 		- Baixe e execute o msi do Redis e deixe que o mesmo rode na porta padrão (6379). 
 		- Baixe e descompacte a pasta do memcached. Há a possibilidade de roda-lo como um serviço do windows, mas caso isso não aconteça, é necessário deixa-lo rodando.
 
