@@ -10,14 +10,14 @@ class RoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = str(self.scope['url_route']['kwargs'].get('pk', None))
         user = self.scope['url_route']['kwargs'].get('user_id', None)
-        user_connections = await self.update_user_incr(user)
-        if user_connections > 0:
+        # user_connections = await self.update_user_incr(user)
+        # if user_connections > 0:
         # enviar apenas se as connections do usuario forem maior que 0
-            await self.channel_layer.group_send(self.room_group_name, {
-                                'type': 'send_message',
-                                'user': user,
-                                "event": "new_player"
-                            })
+        await self.channel_layer.group_send(self.room_group_name, {
+                            'type': 'send_message',
+                            'user': user,
+                            "event": "new_player"
+                        })
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -30,13 +30,13 @@ class RoomConsumer(AsyncWebsocketConsumer):
         print("Disconnected")
         user = self.scope['url_route']['kwargs'].get('user_id', None)
         await self.update_user_decr(user)
-        user_connections = await self.update_user_incr(user)
-        if user_connections == 0:
-            await self.channel_layer.group_send(self.room_group_name, {
-                    'type': 'send_message',
-                    'user': user,
-                    "event": "disconnected_player"
-                })
+        # user_connections = await self.update_user_incr(user)
+        # if user_connections == 0:
+        await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'user': user,
+                "event": "disconnected_player"
+            })
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
