@@ -8,16 +8,21 @@ from channels.db import database_sync_to_async
 class RoomConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+        # utiliza o pk enviado na url como nome da sala
         self.room_group_name = str(self.scope['url_route']['kwargs'].get('pk', None))
+        # pega o user_id da url
         user = self.scope['url_route']['kwargs'].get('user_id', None)
-        # user_connections = await self.update_user_incr(user)
-        # if user_connections > 0:
-        # enviar apenas se as connections do usuario forem maior que 0
-        await self.channel_layer.group_send(self.room_group_name, {
-                            'type': 'send_message',
-                            'user': user,
-                            "event": "new_player"
-                        })
+        # aumenta em 1 o número de connections do usuário
+        user_connections = await self.update_user_incr(user)
+        # enviar apenas se as connections do usuario forem maior que 0, ou seja, se o usuário estiver online
+        if user_connections > 0:
+            # envia para todos da mesma sala a mensagem 
+            await self.channel_layer.group_send(self.room_group_name, {
+                                'type': 'send_message',
+                                'user': user,
+                                "event": "new_player"
+                            })
+
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -25,16 +30,17 @@ class RoomConsumer(AsyncWebsocketConsumer):
         await self.accept()
                         
     async def disconnect(self, close_code):
-        print("Disconnected")
+        # pega o user_id da url
         user = self.scope['url_route']['kwargs'].get('user_id', None)
-        await self.update_user_decr(user)
-        # user_connections = await self.update_user_incr(user)
-        # if user_connections == 0:
-        await self.channel_layer.group_send(self.room_group_name, {
-                'type': 'send_message',
-                'user': user,
-                "event": "disconnected_player"
-            })
+        user_connections = await self.update_user_decr(user)
+        # se a quantidade de connections do usuário for igual a 0, 
+        # todos do grupo irão receber uma mensagem avisando que o player foi desconectado e está offline
+        if user_connections == 0:
+            await self.channel_layer.group_send(self.room_group_name, {
+                    'type': 'send_message',
+                    'user': user,
+                    "event": "disconnected_player"
+                })
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -50,6 +56,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         event = response.get("event", None)
         message = response.get("message", None)
         if 'remove_player':
+            # evento de remover jogador da sala
             user_id = response.get('user', None)
             try:
                 room = await Room.objects.aget(id=self.room_group_name)
@@ -67,8 +74,6 @@ class RoomConsumer(AsyncWebsocketConsumer):
             try:
                 room = await Room.objects.aget(id=self.room_group_name)
                 await room.finish()
-                instance_data = ''
-                message =  {'instance': instance_data }
                 await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
@@ -118,14 +123,14 @@ class RoomConsumer(AsyncWebsocketConsumer):
         }))
 
     def validate_response(self, instance, operation):
-        if not self.players:
-            return True
-        return instance['id'] in self.players
+        return True
         
     @database_sync_to_async
     def update_user_incr(self, user_id):
+        # incrementa o numero de connections do usuário em 1
         return User.objects.filter(id=user_id).update(connections=F('connections') + 1)
         
     @database_sync_to_async
     def update_user_decr(self, user_id):
+        # decrementa o numero de connections do usuário em 1
         return User.objects.filter(id=user_id).update(connections=F('connections') - 1)
