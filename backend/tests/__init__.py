@@ -1,1 +1,1 @@
-from .websocket_test import TestConnection
+from backend.tests import websocket_test;

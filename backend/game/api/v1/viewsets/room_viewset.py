@@ -17,7 +17,7 @@ class RoomViewset(ModelViewSet):
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
         instance.users.add(user)
-        return Response({'success':True},status=status.HTTP_200_OK)
+        return Response({'success':True}, status=status.HTTP_200_OK)
 
     
     @action(detail=True, methods=['put'])
@@ -26,7 +26,7 @@ class RoomViewset(ModelViewSet):
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
         instance.users.remove(user)
-        return Response({'success':True},status=status.HTTP_200_OK)
+        return Response({'success':True}, status=status.HTTP_200_OK)
 
 
     @action(detail=True, methods=['get'])
