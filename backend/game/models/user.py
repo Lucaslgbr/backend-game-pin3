@@ -7,4 +7,4 @@ class User(AbstractUser):
     birth_date = models.DateField()
     email = models.EmailField()
     date_joined = models.DateTimeField(blank=True, null=True, default=timezone.now)
-
+    connections = models.IntegerField(default=0)

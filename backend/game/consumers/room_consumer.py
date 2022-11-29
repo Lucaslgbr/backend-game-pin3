@@ -1,10 +1,8 @@
 import datetime
 import json
 from asgiref.sync import sync_to_async
-from backend.game.api.v1.serializers import *
-
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
-from backend.game.models import Room, Match
+from backend.game.models import Room, Match, User
 
 class RoomConsumer(AsyncWebsocketConsumer):
 
@@ -23,7 +21,6 @@ class RoomConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        user = self.scope['user']
 
     async def receive(self, text_data):
         """
@@ -33,10 +30,23 @@ class RoomConsumer(AsyncWebsocketConsumer):
         response = json.loads(text_data)
         event = response.get("event", None)
         message = response.get("message", None)
-        if event == 'finish_room':
-            room_id = response.get('room', None)
+        if 'remove_player':
+            user_id = response.get('user', None)
             try:
-                room = await Room.objects.aget(id=room_id)
+                room = await Room.objects.aget(id=self.room_group_name)
+                user = await User.objects.aget(id=user_id)
+                await room.users.remove(user)
+                await self.channel_layer.group_send(self.room_group_name, {
+                    'type': 'send_message',
+                    'message': message,
+                    'user': user,
+                    "event": event
+                })
+            except Exception as e:
+                print(e)
+        if event == 'finish_room':
+            try:
+                room = await Room.objects.aget(id=self.room_group_name)
                 await room.finish()
                 instance_data = ''
                 message =  {'instance': instance_data }
@@ -61,7 +71,21 @@ class RoomConsumer(AsyncWebsocketConsumer):
                     })
             except Exception as e:
                 print(e)
-            
+
+        if event == 'start_match':
+            try:
+                room = await Room.objects.aget(id=self.room_group_name)
+                match = await Match.objects.acreate(room=room)
+                await match.finish()
+                message = 'success'
+                await self.channel_layer.group_send(self.room_group_name, {
+                    'type': 'send_message',
+                    'message': 'success',
+                    "event": event
+                    })
+            except Exception as e:
+                print(e)
+
         if event == 'message':
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -82,8 +106,8 @@ class RoomConsumer(AsyncWebsocketConsumer):
         
     # @database_sync_to_async
     # def update_user_incr(self, user):
-    #     User.objects.filter(pk=user.pk).update(online=F('online') + 1)
+    #     User.objects.filter(pk=user.pk).update(connections=F('connections') + 1)
 
     # @database_sync_to_async
     # def update_user_decr(self, user):
-    #     UserProfile.objects.filter(pk=user.pk).update(online=F('online') - 1)
+    #     User.objects.filter(pk=user.pk).update(connections=F('connections') - 1)

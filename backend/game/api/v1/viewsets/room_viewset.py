@@ -7,6 +7,10 @@ class  RoomViewset(ModelViewSet):
     queryset = Room.objects.all()
     serializer_class=RoomSerializer
 
+
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+        
     def update(self, request, *args, **kwargs):
         users = request.data.get('users')
         request.data.pop('users')
