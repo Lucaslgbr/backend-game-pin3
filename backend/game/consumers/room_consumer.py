@@ -1,14 +1,17 @@
 import datetime
 import json
+from django.db.models import F
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
 from backend.game.models import Room, Match, User
-
+from channels.db import database_sync_to_async
 class RoomConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        self.room_group_name = self.scope['path'].split('/')[2]
+        self.room_group_name = str(self.scope['url_route']['kwargs'].get('pk', None))
         self.pk = self.scope['url_route']['kwargs'].get('pk', None)
+        user = self.scope['url_route']['kwargs'].get('user_id', None)
+        await self.update_user_incr(user)
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -17,6 +20,8 @@ class RoomConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         print("Disconnected")
+        user = self.scope['url_route']['kwargs'].get('user_id', None)
+        await self.update_user_decr(user)
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -103,10 +108,10 @@ class RoomConsumer(AsyncWebsocketConsumer):
             return True
         return instance['id'] in self.players
         
-    # @database_sync_to_async
-    # def update_user_incr(self, user):
-    #     User.objects.filter(pk=user.pk).update(connections=F('connections') + 1)
+    @database_sync_to_async
+    def update_user_incr(self, user_id):
+        User.objects.filter(id=user_id).update(connections=F('connections') + 1)
 
-    # @database_sync_to_async
-    # def update_user_decr(self, user):
-    #     User.objects.filter(pk=user.pk).update(connections=F('connections') - 1)
+    @database_sync_to_async
+    def update_user_decr(self, user_id):
+        User.objects.filter(id=user_id).update(connections=F('connections') - 1)
