@@ -26,6 +26,12 @@ class RoomViewset(ModelViewSet):
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
         instance.users.remove(user)
+        user.connections = 0
+        user.save()
+        channel_layer = get_channel_layer()
+        room_name = str(instance.id)
+        async_to_sync(channel_layer.group_send)(room_name, {"type": "send_message",
+                                                            "event":"remove_player"})
         return Response({'success':True}, status=status.HTTP_200_OK)
 
 
