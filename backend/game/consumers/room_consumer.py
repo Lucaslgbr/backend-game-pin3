@@ -128,9 +128,15 @@ class RoomConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def update_user_incr(self, user_id):
         # incrementa o numero de connections do usuário em 1
-        return User.objects.filter(id=user_id).update(connections=F('connections') + 1)
+        user = User.objects.get(id=user_id)
+        user.connections = user.connections + 1
+        user.save()
+        return user.connections
         
     @database_sync_to_async
     def update_user_decr(self, user_id):
         # decrementa o numero de connections do usuário em 1
-        return User.objects.filter(id=user_id).update(connections=F('connections') - 1)
+        user = User.objects.get(id=user_id)
+        user.connections = user.connections - 1 if user.connections > 0 else 0
+        user.save()
+        return user.connections
