@@ -42,6 +42,7 @@ class RoomViewset(ModelViewSet):
         else:
             instance.active = False
             instance.status = RoomStatus.FINISHED
+        instance.save()
         user.connections = 0
         user.save()
         channel_layer = get_channel_layer()
