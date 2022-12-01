@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from backend.game.enums.room_status import RoomStatus
 
 class RoomViewset(ModelViewSet):
     queryset = Room.objects.all()
@@ -16,7 +17,11 @@ class RoomViewset(ModelViewSet):
         instance = self.get_object()
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
+        if user.has_room:
+            return Response({'success':False}, status=status.HTTP_400_BAD_REQUEST)    
         instance.users.add(user)
+        user.has_room = True
+        user.save()
         return Response({'success':True}, status=status.HTTP_200_OK)
 
     
@@ -26,6 +31,14 @@ class RoomViewset(ModelViewSet):
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
         instance.users.remove(user)
+        user.has_room = False
+        user.save()
+        if user == instance.owner:
+            if instance.users.count() > 0:
+                instance.owner = instance.users.first()
+            else:
+                instance.active = False
+                instance.status = RoomStatus.FINISHED
         user.connections = 0
         user.save()
         channel_layer = get_channel_layer()
