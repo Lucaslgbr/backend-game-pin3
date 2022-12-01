@@ -48,6 +48,7 @@ class RoomViewset(ModelViewSet):
         channel_layer = get_channel_layer()
         room_name = str(instance.id)
         async_to_sync(channel_layer.group_send)(room_name, {"type": "send_message",
+                                                            "user":user.id,
                                                             "event":"remove_player"})
         return Response({'success':True}, status=status.HTTP_200_OK)
 
