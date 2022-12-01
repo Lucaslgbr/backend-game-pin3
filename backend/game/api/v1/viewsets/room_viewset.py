@@ -17,12 +17,15 @@ class RoomViewset(ModelViewSet):
         instance = self.get_object()
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
-        if user.has_room:
-            return Response({'success':False}, status=status.HTTP_400_BAD_REQUEST)    
-        instance.users.add(user)
-        user.has_room = True
-        user.save()
-        return Response({'success':True}, status=status.HTTP_200_OK)
+        if not user.current_room:
+            instance.users.add(user)
+            user.current_room = instance
+            user.save()
+            return Response({'success':True}, status=status.HTTP_200_OK)
+        else:
+            if instance == user.current_room:
+                return Response({'success':True}, status=status.HTTP_200_OK)
+            return Response({'success':False}, status=status.HTTP_400_BAD_REQUEST)
 
     
     @action(detail=True, methods=['put'])
@@ -31,7 +34,7 @@ class RoomViewset(ModelViewSet):
         user_id =  self.request.data.get('user')
         user = User.objects.get(id=user_id)
         instance.users.remove(user)
-        user.has_room = False
+        user.current_room = None
         user.save()
         if user == instance.owner:
             if instance.users.count() > 0:

@@ -7,4 +7,4 @@ class User(AbstractUser):
     email = models.EmailField()
     date_joined = models.DateTimeField(blank=True, null=True, default=timezone.now)
     connections = models.IntegerField(default=0)
-    has_room = models.BooleanField(default=False)
+    current_room = models.ForeignKey('Room', null=True, blank=True, on_delete=models.DO_NOTHING)
