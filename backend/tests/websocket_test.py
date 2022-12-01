@@ -1,6 +1,11 @@
 import asyncio
 import websockets
 from  pywsitest import WSTest, WSResponse, WSMessage
+from threading import Thread
+
+import asyncio
+import websockets
+
 
 async def test_ws_connection(room, user):
     ws_test_1 = (

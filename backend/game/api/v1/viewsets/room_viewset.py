@@ -36,12 +36,12 @@ class RoomViewset(ModelViewSet):
         instance.users.remove(user)
         user.current_room = None
         user.save()
-        if user == instance.owner:
-            if instance.users.count() > 0:
+        if instance.users.count() > 0:
+            if user == instance.owner:
                 instance.owner = instance.users.first()
-            else:
-                instance.active = False
-                instance.status = RoomStatus.FINISHED
+        else:
+            instance.active = False
+            instance.status = RoomStatus.FINISHED
         user.connections = 0
         user.save()
         channel_layer = get_channel_layer()
