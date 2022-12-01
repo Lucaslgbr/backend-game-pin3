@@ -13,3 +13,5 @@ class UserViewset(ModelViewSet):
         user.set_password(request.data['password'])
         user.save()
         return response
+
+    
