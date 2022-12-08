@@ -97,7 +97,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
                 'type': 'send_message',
                 'sender': self.user,
                 'message': message,
-                "event": message
+                "event": event
             })
 
     async def send_message(self, res):
